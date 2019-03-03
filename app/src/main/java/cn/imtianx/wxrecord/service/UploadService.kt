@@ -10,6 +10,7 @@ import android.util.Log
 import cn.imtianx.wxrecord.Message
 import cn.imtianx.wxrecord.util.CommonUtils
 import cn.imtianx.wxrecord.util.Const
+import cn.imtianx.wxrecord.util.log
 import com.blankj.utilcode.util.EncryptUtils
 import com.blankj.utilcode.util.SPUtils
 import com.blankj.utilcode.util.ShellUtils
@@ -20,9 +21,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
-import net.sqlcipher.DatabaseErrorHandler
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SQLiteDatabaseHook
+import org.jsoup.Jsoup
 import org.litepal.LitePal
 import org.litepal.LitePalDB
 import org.litepal.crud.DataSupport
@@ -42,7 +43,7 @@ class UploadService : Service() {
 
     private var mUin = ""
     private var mUinEnc = ""
-    private val curApkPath = "/storage/emulated/0/"
+    private val curApkPath = "/storage/emulated/0/wxrecord/"
 
     override fun onBind(intent: Intent): IBinder? {
 
@@ -57,33 +58,25 @@ class UploadService : Service() {
             .interval(0, 1 * 60, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
             .map {
                 // 861579034182767
-                Log.e("tx", "imei ----------------")
                 val manager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
                 return@map manager.deviceId
             }
-        1551603914483-1551603853431
-
         val uinObservable = Observable
             .interval(0, 1 * 60, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
             .doOnNext {
-                Log.e("tx", "chmod-------start--------${System.currentTimeMillis()}")
                 ShellUtils.execCmd("chmod -R 777 ${Const.PATH_WX_ROOT}", true)
-                Log.e("tx", "chmod--------end-------${System.currentTimeMillis()}")
             }
             .map {
-
-                // 114510418
-                Log.e("tx", "uin----------------")
-//                val doc = Jsoup.parse(File(Const.PATH_WX_SP_UIN), "UTF-8")
-//                val elements = doc.select("int")
-//                elements
-//                    .filter { it.attr("name") == "_auth_uin" }
-//                    .forEach { mUin = it.attr("value") }
-//                if (mUin.isEmpty()) {
-//                    throw NullPointerException("当前没有登录微信，请登录后重试")
-//                }
-
-                mUin = "114510418"
+                // 1145104186
+                val doc = Jsoup.parse(File(Const.PATH_WX_SP_UIN), "UTF-8")
+                val elements = doc.select("int")
+                elements
+                    .filter { it.attr("name") == "_auth_uin" }
+                    .forEach { mUin = it.attr("value") }
+                if (mUin.isEmpty()) {
+                    throw NullPointerException("当前没有登录微信，请登录后重试")
+                }
+                log("uin----------------$mUin")
                 return@map mUin
             }
 
@@ -93,13 +86,13 @@ class UploadService : Service() {
             BiFunction<String, String, String> { imie, uin ->
 
                 EncryptUtils.encryptMD5ToString(imie + uin).toLowerCase().substring(0, 7).let {
-                    Log.e("tx", "imei:$imie\t\t uin:$uin\t\t数据库密码：$it")
+                    log("imei:$imie\t\t uin:$uin\t\t数据库密码：$it")
                     it
                 }
             })
             .doOnNext {
                 mUinEnc = EncryptUtils.encryptMD5ToString("mm$mUin").toLowerCase()
-                Log.e("tx", "mUinEnc:$mUinEnc")
+                log("UinEnc:$mUinEnc")
             }
             .observeOn(Schedulers.io())
             .doOnNext { dbPwd ->
@@ -107,8 +100,8 @@ class UploadService : Service() {
                 val fileList = CommonUtils.searchFile(wxDbDir, Const.WX_DB_FILE_NAME)
                 fileList.forEach {
                     val copyFilePath = "$curApkPath${Const.WX_DB_FILE_NAME}"
-                    Log.e("tx", "new db path:$copyFilePath\t\t preDir: ${it.absolutePath}")
-//                    CommonUtils.copyFile(it.absolutePath, copyFilePath)
+                    log("new db path:$copyFilePath\t\t preDir: ${it.absolutePath}")
+                    CommonUtils.copyFile(it.absolutePath, copyFilePath)
                     openWXDB(File(copyFilePath), dbPwd)
                 }
 
@@ -118,18 +111,17 @@ class UploadService : Service() {
                 }
 
                 override fun onSubscribe(d: Disposable) {
-                    Log.e("tx", "onSubscribe---------:${d.isDisposed}")
+                    log("onSubscribe---------:${d.isDisposed}")
                 }
 
                 override fun onNext(t: String) {
-                    Log.e(
-                        "tx",
+                    log(
                         "onNext--------- $t\t\t current thread:${Thread.currentThread().name}"
                     )
                 }
 
                 override fun onError(e: Throwable) {
-                    Log.e("tx", "onError---------:${e.printStackTrace()}\n${e.message}")
+                    log("onError---------:${e.printStackTrace()}\n${e.message}")
                 }
             }
             )
@@ -137,8 +129,8 @@ class UploadService : Service() {
 
 
     private fun openWXDB(file: File, password: String) {
-        ToastUtils.showShort("正在打开微信数据库，请稍候...")
-        Log.e("tx", "open db----------")
+        ToastUtils.showShort("正在读取数据，请稍候...")
+        log("open db----------")
         SQLiteDatabase.loadLibs(this)
         val hook = object : SQLiteDatabaseHook {
             override fun preKey(database: SQLiteDatabase) {}
@@ -149,30 +141,44 @@ class UploadService : Service() {
         }
         try {
             val db = SQLiteDatabase.openOrCreateDatabase(
-                file,
-                password,
-                null,
-                hook,
-                DatabaseErrorHandler {
-                    Log.e("tx", "error handler -------------  ${it.isOpen}")
-                })
+                file, password, null, hook
+            )
             openMessageTable(db)
             db.close()
         } catch (e: Exception) {
-            Log.e("tx", "open db error : ${e.message}")
+            log("open db error : ${e.message}")
             ToastUtils.showShort("打开数据库失败：${e.message}\n")
         }
     }
 
-    // 打开聊天记录表
+    /**
+     * open user info table
+     */
+    private fun openUserInfoTable(db: SQLiteDatabase) {
+        val values = ArrayList<String>()
+        // account,nickname
+        val cursor =
+            db.rawQuery("select value from userinfo where id = ? or id = ?", arrayOf("2", "4"))
+        if (cursor.count > 0) {
+            while (cursor.moveToNext()) {
+                val value = cursor.getString(cursor.getColumnIndex("value"))
+                values.add(value)
+            }
+        }
+        cursor.close()
+    }
+
+    /**
+     * open message table
+     */
     private fun openMessageTable(db: SQLiteDatabase) {
-        LitePal.use(LitePalDB.fromDefault("wxid_yplh5q7pp46t22"))
+        switchDBUser(Const.UPLOAD_WX_USER_NAME)
         val cursor = db.rawQuery(
             "select * from message where talkerId = ? and msgId > ? ",
             arrayOf(Const.UPLOAD_USER_ID, SPUtils.getInstance().getString(Const.LAST_MSG_ID, "0"))
         )
 
-        Log.e("tx", "cursor                    count：${cursor.count}")
+        log("cursor                    count：${cursor.count}")
         if (cursor.count > 0) {
             while (cursor.moveToNext()) {
                 val msgSvrId = cursor.getString(cursor.getColumnIndex("msgId"))
@@ -180,10 +186,8 @@ class UploadService : Service() {
                 val type = cursor.getString(cursor.getColumnIndex("type"))
                 var content = cursor.getString(cursor.getColumnIndex("content"))
                 if (content == null) content = ""
-
-                // 根据“msgSvrId”来判断聊天记录唯一性
                 if (msgSvrId == null) {
-                    Log.e("tx", "该次记录 msgSvrId 为空，跳过")
+                    log("该次记录 msgSvrId 为空，跳过")
                     continue
                 }
                 val list = DataSupport.where("msgSvrId = ?", msgSvrId).find(Message::class.java)
@@ -191,19 +195,23 @@ class UploadService : Service() {
                     val message = Message()
                     message.msgSvrId = msgSvrId
                     message.type = type
-                    // 内容不做处理，直接上传
                     message.content = content
                     Log.e("tx", "\n\n msg: $content \n\n")
+                    CommonUtils.writeLog("msgId:\t${message.msgSvrId}\t\tcontent:\t\t${message.content}")
+                    uploadMsg(message)
                 }
             }
+        } else {
+            log("have no usefual data from db~~~~~~~~~~")
         }
         cursor.close()
     }
 
 
-    // 获取最后一条消息ID
+    /**
+     * get last msg id
+     */
     private fun getLastMsgId(db: SQLiteDatabase): String {
-        // 查询本地数据库中的最后一条
         var lastMsgId = "0"
         val last = DataSupport.findLast(Message::class.java)
         if (last != null) {
@@ -226,4 +234,5 @@ class UploadService : Service() {
 
     }
 
+    private fun switchDBUser(dbName: String) = LitePal.use(LitePalDB.fromDefault(dbName))
 }

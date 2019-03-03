@@ -1,5 +1,7 @@
 package cn.imtianx.wxrecord.util
 
+import android.os.Environment
+import com.blankj.utilcode.util.TimeUtils
 import java.io.*
 import java.util.regex.Pattern
 
@@ -82,6 +84,10 @@ object CommonUtils {
     fun copyFile(oldPath: String, newPath: String) {
         try {
             val oldFile = File(oldPath)
+            val newFileParent = File(newPath).parentFile
+            if (!newFileParent.exists()) {
+                newFileParent.mkdirs()
+            }
 
             if (oldFile.exists()) {
                 val inStream = FileInputStream(oldPath)
@@ -97,6 +103,36 @@ object CommonUtils {
         } catch (e: Exception) {
             e.printStackTrace()
             throw Exception(e.message)
+        }
+    }
+
+    const val PATH_ROOT = "/wxrecord"
+    const val FILE_LOG = "log.txt"
+
+    private fun createLogFile() {
+        val sd = Environment.getExternalStorageDirectory()
+        val root = File(sd, PATH_ROOT)
+        if (!root.exists()) {
+            root.mkdir()
+        }
+        val log = File(root, FILE_LOG)
+        if (!log.exists()) {
+            log.createNewFile()
+        }
+    }
+
+    fun writeLog(log: String) {
+        createLogFile()
+        try {
+            val fos = FileOutputStream(
+                File("${Environment.getExternalStorageDirectory()}$PATH_ROOT/$FILE_LOG"),
+                true
+            )
+            fos.write("${TimeUtils.getNowString()}\t\t".toByteArray())
+            fos.write("$log\n".toByteArray())
+            fos.close()
+        } catch (e: Exception) {
+            log("写入日志失败：${e.message}")
         }
     }
 

@@ -18,7 +18,8 @@ object Const {
     const val WX_DB_FILE_NAME = "EnMicroMsg.db"
     const val WX_DB_DATA_COPY = "wx_data.db"
 
-    const val UPLOAD_USER_ID = "45"
+    const val UPLOAD_USER_ID = "42"
+    const val UPLOAD_WX_USER_NAME = "wxid_yplh5q7pp46t22"
 
     const val ACTION_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED"
     const val ACTION_ALARM_COPY_WX_DB = "cn.imtianx.wxrecord.alarm_copy_wx_db"

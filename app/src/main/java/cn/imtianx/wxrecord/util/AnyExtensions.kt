@@ -1,6 +1,8 @@
 package cn.imtianx.wxrecord.util
 
+import android.util.Log
 import com.blankj.utilcode.util.ShellUtils
+import com.blankj.utilcode.util.TimeUtils
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.regex.Pattern
@@ -42,4 +44,8 @@ fun ShellUtils.checkRoot(pkgCodePath: String): Boolean {
             throw Exception(e.message)
         }
     }
+}
+
+fun Any.log(msg: String = "") {
+    Log.e("tx", "\t\ttime: ${TimeUtils.getNowString()}\t\tmsg:\t\t$msg \n")
 }
