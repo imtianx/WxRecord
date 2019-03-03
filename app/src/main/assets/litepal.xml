@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<litepal>
+    <dbname value="wxrecord"/>
+    <version value="1"/>
+    
+    <list>
+        <mapping class="cn.imtianx.wxrecord.Message"/>
+        <mapping class="cn.imtianx.wxrecord.Contact"/>
+        <mapping class="cn.imtianx.wxrecord.ChatRoom"/>
+        <mapping class="cn.imtianx.wxrecord.WeChatFile"/>
+    </list>
+    
+    <storage value="external" />
+
+</litepal>
