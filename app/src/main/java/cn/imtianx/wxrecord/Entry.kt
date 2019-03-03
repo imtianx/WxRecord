@@ -57,6 +57,8 @@ class LaunchApp2Front
 
 class RefreshMsgId
 
-class UploadStatus(var status: String)
+class UploadStatus(
+    var status: String // -1暂无数据，0停止，1正在上传
+)
 
 

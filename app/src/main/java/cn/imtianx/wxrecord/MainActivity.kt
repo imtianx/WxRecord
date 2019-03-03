@@ -11,6 +11,7 @@ import android.os.Handler
 import android.os.Message
 import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
+import android.view.View
 import cn.imtianx.wxrecord.service.UploadService
 import cn.imtianx.wxrecord.util.CommonUtils
 import cn.imtianx.wxrecord.util.Const
@@ -36,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
     private var mWxAlarmManager: AlarmManager? = null
 
-    private var  currentUploadStatus  = "-1"
+    private var currentUploadStatus = "-1"
 
     private val mHandler = @SuppressLint("HandlerLeak")
     object : Handler() {
@@ -86,6 +87,23 @@ class MainActivity : AppCompatActivity() {
         }
 
         registerWxAlarm()
+
+
+        btn_control.setOnClickListener {
+            when (currentUploadStatus) {
+                "-1" -> {
+                    currentUploadStatus = "1"
+                }
+                "0" -> {
+                    currentUploadStatus = "1"
+                }
+                "1" -> {
+                    currentUploadStatus = "0"
+                }
+            }
+            SPUtils.getInstance().put(Const.UPLOAD_STATUS, currentUploadStatus)
+            refreshUI(currentUploadStatus)
+        }
     }
 
     private fun registerWxAlarm() {
@@ -120,6 +138,30 @@ class MainActivity : AppCompatActivity() {
         when (event) {
             is LaunchApp2Front -> {
                 sendMessage(MSG_LAUNCH_CUR_APP, 1000L)
+            }
+            is UploadStatus -> {
+                refreshUI(event.status)
+            }
+        }
+    }
+
+    private fun refreshUI(status: String) {
+        currentUploadStatus = status
+        ll_upload.visibility = if (status == "1") {
+            View.VISIBLE
+        } else {
+            View.INVISIBLE
+        }
+        btn_control.text = when (status) {
+            "0" -> {
+                "开始上传"
+            }
+            "1" -> {
+                "停止上传"
+            }
+            else -> {
+                ToastUtils.showShort("开始检查数据~~")
+                "暂无数据可上传"
             }
         }
     }

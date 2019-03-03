@@ -29,4 +29,6 @@ object Const {
     const val BASE_URL = "http://192.168.1.54:9001/api/"
     const val API_UPLOAD_WX_MSG = "ins/web/invoice/info/saveInvoiceWechat"
 
+    const val UPLOAD_STATUS = "upload_status"
+
 }
