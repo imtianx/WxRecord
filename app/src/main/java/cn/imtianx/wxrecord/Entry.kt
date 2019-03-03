@@ -52,3 +52,10 @@ class WeChatFile : DataSupport() {
 }
 
 
+
+// event msg
+class LaunchApp2Front
+
+class RefreshMsgId
+
+

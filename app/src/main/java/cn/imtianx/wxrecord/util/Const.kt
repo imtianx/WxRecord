@@ -22,7 +22,7 @@ object Const {
     const val UPLOAD_WX_USER_NAME = "wxid_yplh5q7pp46t22"
 
     const val ACTION_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED"
-    const val ACTION_ALARM_COPY_WX_DB = "cn.imtianx.wxrecord.alarm_copy_wx_db"
+    const val ACTION_LAUNCH_WX_APP = "cn.imtianx.wxrecord.launch_wx_app"
 
     const val IS_NEED_COPY_WX_DB =  "is_need_copy_wx_db"
 

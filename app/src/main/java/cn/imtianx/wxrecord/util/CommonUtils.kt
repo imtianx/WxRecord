@@ -1,5 +1,7 @@
 package cn.imtianx.wxrecord.util
 
+import android.app.ActivityManager
+import android.content.Context
 import android.os.Environment
 import com.blankj.utilcode.util.TimeUtils
 import java.io.*
@@ -136,5 +138,16 @@ object CommonUtils {
         }
     }
 
+    fun isAppRunning(context: Context, pkgName: String): Boolean {
+        (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
+            .apply {
+                getRunningTasks(1000).forEach { taskInfo ->
+                    if (taskInfo.topActivity.packageName == pkgName) {
+                        return true
+                    }
+                }
+            }
+        return false
+    }
 
 }

@@ -8,6 +8,7 @@ import android.os.IBinder
 import android.telephony.TelephonyManager
 import android.util.Log
 import cn.imtianx.wxrecord.Message
+import cn.imtianx.wxrecord.RefreshMsgId
 import cn.imtianx.wxrecord.util.CommonUtils
 import cn.imtianx.wxrecord.util.Const
 import cn.imtianx.wxrecord.util.log
@@ -23,6 +24,7 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SQLiteDatabaseHook
+import org.greenrobot.eventbus.EventBus
 import org.jsoup.Jsoup
 import org.litepal.LitePal
 import org.litepal.LitePalDB
@@ -53,7 +55,6 @@ class UploadService : Service() {
     @SuppressLint("HardwareIds", "CheckResult")
     override fun onCreate() {
         super.onCreate()
-
         val imeiObservable = Observable
             .interval(0, 1 * 60, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
             .map {
@@ -127,9 +128,8 @@ class UploadService : Service() {
             )
     }
 
-
     private fun openWXDB(file: File, password: String) {
-        ToastUtils.showShort("正在读取数据，请稍候...")
+        ToastUtils.showShort("正在读取微信数据，请稍候...")
         log("open db----------")
         SQLiteDatabase.loadLibs(this)
         val hook = object : SQLiteDatabaseHook {
@@ -197,7 +197,6 @@ class UploadService : Service() {
                     message.type = type
                     message.content = content
                     Log.e("tx", "\n\n msg: $content \n\n")
-                    CommonUtils.writeLog("msgId:\t${message.msgSvrId}\t\tcontent:\t\t${message.content}")
                     uploadMsg(message)
                 }
             }
@@ -232,6 +231,8 @@ class UploadService : Service() {
 
     private fun uploadMsg(message: Message) {
 
+        CommonUtils.writeLog("msgId:\t${message.msgSvrId}\t\tcontent:\t\t${message.content}")
+        EventBus.getDefault().post(RefreshMsgId())
     }
 
     private fun switchDBUser(dbName: String) = LitePal.use(LitePalDB.fromDefault(dbName))
