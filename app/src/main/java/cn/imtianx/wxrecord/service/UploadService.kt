@@ -7,9 +7,9 @@ import android.content.Intent
 import android.os.IBinder
 import android.telephony.TelephonyManager
 import android.util.Log
-import cn.imtianx.wxrecord.Message
-import cn.imtianx.wxrecord.RefreshMsgId
-import cn.imtianx.wxrecord.UploadStatus
+import cn.imtianx.wxrecord.data.Message
+import cn.imtianx.wxrecord.data.RefreshMsgId
+import cn.imtianx.wxrecord.data.UploadStatus
 import cn.imtianx.wxrecord.util.CommonUtils
 import cn.imtianx.wxrecord.util.Const
 import cn.imtianx.wxrecord.util.log

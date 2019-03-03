@@ -3,9 +3,10 @@ package cn.imtianx.wxrecord.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import cn.imtianx.wxrecord.LaunchApp2Front
+import cn.imtianx.wxrecord.data.LaunchApp2Front
 import cn.imtianx.wxrecord.util.Const
 import cn.imtianx.wxrecord.util.log
+import com.blankj.utilcode.util.SPUtils
 import org.greenrobot.eventbus.EventBus
 
 /**
@@ -19,7 +20,9 @@ import org.greenrobot.eventbus.EventBus
  */
 class LaunchWxReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action == Const.ACTION_LAUNCH_WX_APP) {
+        if (intent.action == Const.ACTION_LAUNCH_WX_APP &&
+            SPUtils.getInstance().getString(Const.UPLOAD_STATUS) != "-1"
+        ) {
             context.let {
                 it.startActivity(it.packageManager.getLaunchIntentForPackage(Const.PKG_NAME_WX))
                 EventBus.getDefault().post(LaunchApp2Front())

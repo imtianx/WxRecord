@@ -1,4 +1,4 @@
-package cn.imtianx.wxrecord
+package cn.imtianx.wxrecord.ui
 
 import android.annotation.SuppressLint
 import android.app.ActivityManager
@@ -11,7 +11,12 @@ import android.os.Handler
 import android.os.Message
 import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
+import cn.imtianx.wxrecord.R
+import cn.imtianx.wxrecord.data.LaunchApp2Front
+import cn.imtianx.wxrecord.data.UploadStatus
 import cn.imtianx.wxrecord.service.UploadService
 import cn.imtianx.wxrecord.util.CommonUtils
 import cn.imtianx.wxrecord.util.Const
@@ -165,6 +170,25 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menu?.let {
+            menuInflater.inflate(R.menu.menu_main, it)
+        }
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        item?.let {
+            when (it.itemId) {
+                R.id.menu_upload_log -> {
+                    UploadLogActivity.launch(this@MainActivity)
+                }
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
 
     override fun onResume() {
         super.onResume()

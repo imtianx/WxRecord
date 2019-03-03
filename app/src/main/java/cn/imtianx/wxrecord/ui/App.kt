@@ -1,4 +1,4 @@
-package cn.imtianx.wxrecord
+package cn.imtianx.wxrecord.ui
 
 import android.app.Application
 import com.blankj.utilcode.util.Utils

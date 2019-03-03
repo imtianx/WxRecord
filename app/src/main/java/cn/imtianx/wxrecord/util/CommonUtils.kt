@@ -138,6 +138,26 @@ object CommonUtils {
         }
     }
 
+    fun readLog(): String {
+        val log = StringBuffer()
+        val file = File(Environment.getExternalStorageDirectory().path + PATH_ROOT, FILE_LOG)
+        if (file.exists()) {
+            log.append(file.readText())
+        }
+        var result = log.toString()
+        if (result.length == 0) {
+            result = "暂无日志~"
+        }
+        return result
+    }
+
+    fun clearLog() {
+        val file = File(Environment.getExternalStorageDirectory().path + PATH_ROOT, FILE_LOG)
+        if (file.exists()) {
+            file.delete()
+        }
+    }
+
     fun isAppRunning(context: Context, pkgName: String): Boolean {
         (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
             .apply {

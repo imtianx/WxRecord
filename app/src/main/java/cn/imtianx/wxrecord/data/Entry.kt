@@ -1,4 +1,4 @@
-package cn.imtianx.wxrecord
+package cn.imtianx.wxrecord.data
 
 import org.litepal.crud.DataSupport
 import java.io.Serializable
