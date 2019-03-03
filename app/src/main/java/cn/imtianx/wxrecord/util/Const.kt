@@ -16,7 +16,6 @@ object Const {
     const val PATH_WX_SP_UIN = "$PATH_WX_ROOT/shared_prefs/auth_info_key_prefs.xml"
     const val PATH_WX_DB = "$PATH_WX_ROOT/MicroMsg/"
     const val WX_DB_FILE_NAME = "EnMicroMsg.db"
-    const val WX_DB_DATA_COPY = "wx_data.db"
 
     const val UPLOAD_USER_ID = "42"
     const val UPLOAD_WX_USER_NAME = "wxid_yplh5q7pp46t22"
@@ -24,8 +23,10 @@ object Const {
     const val ACTION_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED"
     const val ACTION_LAUNCH_WX_APP = "cn.imtianx.wxrecord.launch_wx_app"
 
-    const val IS_NEED_COPY_WX_DB =  "is_need_copy_wx_db"
 
     const val LAST_MSG_ID = "last_wx_id"
+
+    const val BASE_URL = "http://192.168.1.54:9001/api/"
+    const val API_UPLOAD_WX_MSG = "ins/web/invoice/info/saveInvoiceWechat"
 
 }

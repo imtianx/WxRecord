@@ -36,6 +36,8 @@ class MainActivity : AppCompatActivity() {
 
     private var mWxAlarmManager: AlarmManager? = null
 
+    private var  currentUploadStatus  = "-1"
+
     private val mHandler = @SuppressLint("HandlerLeak")
     object : Handler() {
         override fun handleMessage(msg: Message) {

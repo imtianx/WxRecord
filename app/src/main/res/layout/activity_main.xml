@@ -11,8 +11,10 @@
         android:id="@+id/btn_check_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
         android:text="check root"
         android:textAllCaps="false"
+        android:textColor="@android:color/white"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
@@ -29,25 +31,72 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="上一次 msgId : "/>
+            android:text="上一次 msgId : "
+            android:textColor="@android:color/black"/>
         
         <TextView
             android:id="@+id/tv_last_msg_id"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:maxLines="1"
             android:ellipsize="end"
-            android:textColor="@color/colorAccent"/>
+            android:maxLines="1"
+            android:textColor="@color/colorPrimary"/>
         
         <Button
             android:id="@+id/btn_reset_last_msg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="重置 初始 msgId"
-            android:textAllCaps="false"/>
+            android:background="@color/colorAccent"
+            android:padding="4dp"
+            android:text="重置 msgId"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"/>
     
     </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/ll_upload"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/btn_control"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ll_last_msg">
+        
+        <ProgressBar
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:indeterminateTint="@color/colorPrimary"
+            android:indeterminateTintMode="src_atop"/>
+        
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="正在上传...."
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+    
+    </LinearLayout>
+    
+    
+    <Button
+        android:id="@+id/btn_control"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@color/colorPrimary"
+        android:text="停止上传"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ll_upload"/>
+
 
 </android.support.constraint.ConstraintLayout>

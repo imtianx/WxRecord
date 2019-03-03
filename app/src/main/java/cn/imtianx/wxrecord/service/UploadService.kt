@@ -9,6 +9,7 @@ import android.telephony.TelephonyManager
 import android.util.Log
 import cn.imtianx.wxrecord.Message
 import cn.imtianx.wxrecord.RefreshMsgId
+import cn.imtianx.wxrecord.data.DataManager
 import cn.imtianx.wxrecord.util.CommonUtils
 import cn.imtianx.wxrecord.util.Const
 import cn.imtianx.wxrecord.util.log
@@ -182,7 +183,6 @@ class UploadService : Service() {
         if (cursor.count > 0) {
             while (cursor.moveToNext()) {
                 val msgSvrId = cursor.getString(cursor.getColumnIndex("msgId"))
-                SPUtils.getInstance().put(Const.LAST_MSG_ID, msgSvrId ?: "0")
                 val type = cursor.getString(cursor.getColumnIndex("type"))
                 var content = cursor.getString(cursor.getColumnIndex("content"))
                 if (content == null) content = ""
@@ -197,7 +197,7 @@ class UploadService : Service() {
                     message.type = type
                     message.content = content
                     Log.e("tx", "\n\n msg: $content \n\n")
-                    uploadMsg(message)
+//                    uploadMsg(message)
                 }
             }
         } else {
@@ -229,10 +229,25 @@ class UploadService : Service() {
         return lastMsgId
     }
 
+    @SuppressLint("CheckResult")
     private fun uploadMsg(message: Message) {
+        DataManager.postWxMsg(message.content).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ response ->
+                response.data?.let {
+                    if (it) {
+                        CommonUtils.writeLog("msgId:\t${message.msgSvrId}\t\tcontent:\t\t${message.content}")
+                        SPUtils.getInstance().put(Const.LAST_MSG_ID, message.msgSvrId)
+                        EventBus.getDefault().post(RefreshMsgId())
+                    } else {
+                        ToastUtils.showShort(response.msg)
+                    }
+                }
+            }, {
+                log("上传失败：\t\t${it.message}")
+            })
 
-        CommonUtils.writeLog("msgId:\t${message.msgSvrId}\t\tcontent:\t\t${message.content}")
-        EventBus.getDefault().post(RefreshMsgId())
+
     }
 
     private fun switchDBUser(dbName: String) = LitePal.use(LitePalDB.fromDefault(dbName))

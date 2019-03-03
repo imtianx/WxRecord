@@ -52,10 +52,11 @@ class WeChatFile : DataSupport() {
 }
 
 
-
 // event msg
 class LaunchApp2Front
 
 class RefreshMsgId
+
+class UploadStatus(var status: String)
 
 
