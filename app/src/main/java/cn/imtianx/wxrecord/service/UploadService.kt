@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.IBinder
 import android.telephony.TelephonyManager
 import android.util.Log
+import cn.imtianx.wxrecord.data.DataManager
 import cn.imtianx.wxrecord.data.Message
 import cn.imtianx.wxrecord.data.RefreshMsgId
 import cn.imtianx.wxrecord.data.UploadStatus
@@ -175,7 +176,7 @@ class UploadService : Service() {
     private fun openMessageTable(db: SQLiteDatabase) {
         switchDBUser(Const.UPLOAD_WX_USER_NAME)
         val cursor = db.rawQuery(
-            "select * from message where talkerId = ? and msgId > ? ",
+            "select * from message where talkerId = ? and msgId > ? and type = 1",
             arrayOf(Const.UPLOAD_USER_ID, SPUtils.getInstance().getString(Const.LAST_MSG_ID, "0"))
         )
         val count = cursor.count
@@ -197,21 +198,20 @@ class UploadService : Service() {
                     message.msgSvrId = msgSvrId
                     message.type = type
                     message.content = content
-                    Log.e("tx", "\n\n msg: $content \n\n")
-                    uploadMsg(message)
+                    // filter some message
+                    if (message.content.length > 20) {
+                        Log.e("tx", "\n\n msg: $content \n\n")
+                        refreshStatus("1")
+                        uploadMsg(message)
+                    } else {
+                        refreshStatus("-1")
+                    }
                 }
             }
         } else {
+            refreshStatus("-1")
             log("have no usefual data from db~~~~~~~~~~")
         }
-        refreshStatus(
-            if (count > 0) {
-                "1"
-            } else {
-                "-1"
-            }
-        )
-        cursor.close()
     }
 
     private fun refreshStatus(status: String) {
@@ -243,29 +243,22 @@ class UploadService : Service() {
 
     @SuppressLint("CheckResult")
     private fun uploadMsg(message: Message) {
-//        DataManager.postWxMsg(message.content).subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribe({ response ->
-//                response.data?.let {
-//                    if (it) {
-//                        CommonUtils.writeLog("msgId:\t${message.msgSvrId}\t\tcontent:\t\t${message.content}")
-//                        SPUtils.getInstance().put(Const.LAST_MSG_ID, message.msgSvrId)
-//                        EventBus.getDefault().post(RefreshMsgId())
-//                    } else {
-//                        ToastUtils.showShort(response.msg)
-//                    }
-//                }
-//            }, {
-//                log("上传失败：\t\t${it.message}")
-//            })
-
-        if (SPUtils.getInstance().getString(Const.UPLOAD_STATUS) == "1") {
-            log("上传数据-------------")
-            SPUtils.getInstance().put(Const.LAST_MSG_ID, message.msgSvrId)
-            EventBus.getDefault().post(RefreshMsgId())
-        } else {
-            log("不可上传数据-------------")
-        }
+        DataManager.postWxMsg(message.content).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ response ->
+                response.data?.let {
+                    if (it) {
+                        log("上传数据成功-------------")
+                        CommonUtils.writeLog("msgId:\t${message.msgSvrId}\t\tcontent:\t\t${message.content}")
+                        SPUtils.getInstance().put(Const.LAST_MSG_ID, message.msgSvrId)
+                        EventBus.getDefault().post(RefreshMsgId())
+                    } else {
+                        ToastUtils.showShort(response.msg)
+                    }
+                }
+            }, {
+                log("上传失败：\t\t${it.message}")
+            })
     }
 
     private fun switchDBUser(dbName: String) = LitePal.use(LitePalDB.fromDefault(dbName))

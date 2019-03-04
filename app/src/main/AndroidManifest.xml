@@ -38,7 +38,13 @@
             android:label="上传日志"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"/>
-        
+    
+        <activity
+            android:name=".ui.SettingActivity"
+            android:label="设置"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"/>
+    
         <!--自动自动-->
         <receiver
             android:name=".receiver.AutoStartReceiver"

@@ -85,6 +85,7 @@ class MainActivity : AppCompatActivity() {
         btn_reset_last_msg.setOnClickListener {
             SPUtils.getInstance().put(Const.LAST_MSG_ID, "0")
             sendMessage(MSG_REFRESH_LAST_MSG_ID)
+            CommonUtils.clearLog()
         }
 
         if (!EventBus.getDefault().isRegistered(this@MainActivity)) {
@@ -181,6 +182,10 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         item?.let {
             when (it.itemId) {
+                R.id.menu_setting -> {
+                    SettingActivity.launch(this@MainActivity)
+                }
+
                 R.id.menu_upload_log -> {
                     UploadLogActivity.launch(this@MainActivity)
                 }

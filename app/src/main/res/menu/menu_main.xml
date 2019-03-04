@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/menu_setting"
+        android:enabled="true"
+        android:title="设置"/>
+    
+    <item
         android:id="@+id/menu_upload_log"
         android:enabled="true"
         android:title="上传日志"/>
